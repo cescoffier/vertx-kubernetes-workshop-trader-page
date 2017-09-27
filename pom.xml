@@ -63,14 +63,12 @@
             <goals>
               <goal>yarn</goal>
             </goals>
-            <phase>initialize</phase>
           </execution>
           <execution>
             <id>yarn run build</id>
             <goals>
               <goal>yarn</goal>
             </goals>
-            <phase>compile</phase>
             <configuration>
               <arguments>run build</arguments>
             </configuration>
