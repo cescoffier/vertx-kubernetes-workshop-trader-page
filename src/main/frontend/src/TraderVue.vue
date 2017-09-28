@@ -53,19 +53,51 @@
 
 <script>
     import EventBus from 'vertx3-eventbus-client';
-    import $ from "jquery";
+    import jq from "jquery";
     import Chart from "chart.js";
     import PortfolioService from "../libs/portfolio_service-proxy";
 
     export default {
         name: 'Trader',
         data() {
-            
+          return {
+              foo: null
+          }
+        },
+        mounted() {
+            this.service = {};
+            console.log("Mounted");
+            const openEventBus = new Promise((resolve, reject) => {
+                this.eventbus = new EventBus("/eventbus");
+                this.eventbus.onopen = () => resolve(true);
+                this.eventbus.onerror = err => reject(err);
+            });
+            openEventBus.then(v => {
+                console.log("Event bus open");
+                this.eventbus.registerHandler('market', (e, m) => {
+                    handleStockUpdate(m.body);
+                });
+
+                this.service = new PortfolioService(this.eventbus, "service.portfolio");
+                updatePortfolio();
+            });
+
+            // Start periodic tasks
+            retrieveLastOperations();
+            this.retrieveOpsTask = setInterval(retrieveLastOperations, 5000);
+            this.portfolioTask = setInterval(updatePortfolio, 5000);
+
+            createChart();
         },
         beforeMount() {
-
+            console.log("Before mount");
         },
         beforeDestroy() {
+            console.log("Before destroy");
+            this.eventbus.close();
+            clearInterval(this.retrieveOpsTask);
+            clearInterval(this.portfolioTask);
+            clearInterval(this.chartTask);
         }
     }
 
@@ -74,17 +106,6 @@
         "blackcoat": 0,
         "macrohard": 0,
         "index": 0
-    };
-
-    const eventbus = new EventBus('/eventbus');
-    let service;
-    eventbus.onopen = function () {
-        eventbus.registerHandler('market', function (error, message) {
-            handleStockUpdate(message.body);
-        });
-
-        service = new PortfolioService(eventbus, "service.portfolio");
-        updatePortfolio();
     };
 
 
@@ -100,17 +121,17 @@
     }
 
     function retrieveLastOperations() {
-        $.get("/operations", {}, function (json) {
-            const operations = $("#operations");
+        jq.get("/operations", {}, function (json) {
+            const operations = jq("#operations");
             if (json.message) {
                 operations.html("No audit service available");
             } else {
                 operations.empty();
-                $.each(json, function (i, operation) {
-                    let row = $("<tr>");
-                    let action = $("<td>" + operation.action + "</td>");
-                    let amount = $("<td>" + operation.amount + "</td>");
-                    let company = $("<td>" + operation.quote.name + "</td>");
+                jq.each(json, function (i, operation) {
+                    let row = jq("<tr>");
+                    let action = jq("<td>" + operation.action + "</td>");
+                    let amount = jq("<td>" + operation.amount + "</td>");
+                    let company = jq("<td>" + operation.quote.name + "</td>");
                     row.append(action).append(amount).append(company);
                     operations.append(row);
                 });
@@ -120,42 +141,42 @@
     }
 
     function updatePortfolio() {
-        if (!service) {
+        if (!this.service) {
             console.log("Portfolio Service not available");
         } else {
-            service.getPortfolio(function (err, res) {
+            this.service.getPortfolio(function (err, res) {
                 if (err) {
                     console.log("Error while retrieving the portfolio", err);
                 } else {
-                    $("#cash").html(res.cash);
+                    jq("#cash").html(res.cash);
                     let divinator = res.shares["Divinator"];
                     let macrohard = res.shares["MacroHard"];
                     let blackcoat = res.shares["Black Coat"];
 
                     if (divinator) {
-                        $("#divinator").html(divinator);
+                        jq("#divinator").html(divinator);
                     } else {
-                        $("#divinator").html(0);
+                        jq("#divinator").html(0);
                     }
 
                     if (macrohard) {
-                        $("#macrohard").html(macrohard);
+                        jq("#macrohard").html(macrohard);
                     } else {
-                        $("#macrohard").html(0);
+                        jq("#macrohard").html(0);
                     }
 
                     if (blackcoat) {
-                        $("#blackcoat").html(blackcoat);
+                        jq("#blackcoat").html(blackcoat);
                     } else {
-                        $("#blackcoat").html(0);
+                        jq("#blackcoat").html(0);
                     }
 
-                    service.evaluate(function (err, result) {
+                    this.service.evaluate(function (err, result) {
                         if (err) {
                             console.log("Cannot evaluate portfolio", err);
                         } else {
-                            $("#value").html(result);
-                            $("#total").html(parseInt($("#cash").html()) + result);
+                            jq("#value").html(result);
+                            jq("#total").html(parseInt(jq("#cash").html()) + result);
                         }
                     });
                 }
@@ -163,14 +184,6 @@
         }
     }
 
-    $(document).ready(function () {
-        // Start periodic tasks
-        retrieveLastOperations();
-        setInterval(retrieveLastOperations, 5000);
-        setInterval(updatePortfolio, 5000);
-
-        createChart();
-    });
 
     function createChart() {
         let canvas = document.getElementById('chart');
@@ -211,7 +224,7 @@
         const chart = new Chart(ctx).Line(startingData, {animationSteps: 5});
         let lastLabel = 10;
 
-        setInterval(function () {
+        this.chartTask = setInterval(function () {
             chart.addData([quotes.divinator, quotes.blackcoat, quotes.macrohard], ++lastLabel);
             chart.removeData();
         }, 3000);
