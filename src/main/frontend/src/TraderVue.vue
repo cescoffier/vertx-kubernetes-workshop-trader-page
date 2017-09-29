@@ -57,6 +57,7 @@
     import Chart from "chart.js";
     import PortfolioService from "../libs/portfolio_service-proxy";
 
+    let self;
     export default {
         name: 'Trader',
         data() {
@@ -65,6 +66,7 @@
           }
         },
         mounted() {
+            self = this;
             this.service = {};
             console.log("Mounted");
             const openEventBus = new Promise((resolve, reject) => {
@@ -79,13 +81,14 @@
                 });
 
                 this.service = new PortfolioService(this.eventbus, "service.portfolio");
+                console.log("Service", this.service);
+                this.portfolioTask = setInterval(updatePortfolio, 10000);
                 updatePortfolio();
             });
 
             // Start periodic tasks
             retrieveLastOperations();
-            this.retrieveOpsTask = setInterval(retrieveLastOperations, 5000);
-            this.portfolioTask = setInterval(updatePortfolio, 5000);
+            this.retrieveOpsTask = setInterval(retrieveLastOperations, 10000);
 
             createChart();
         },
@@ -141,10 +144,10 @@
     }
 
     function updatePortfolio() {
-        if (!this.service) {
+        if (!self.service) {
             console.log("Portfolio Service not available");
         } else {
-            this.service.getPortfolio(function (err, res) {
+            self.service.getPortfolio(function (err, res) {
                 if (err) {
                     console.log("Error while retrieving the portfolio", err);
                 } else {
@@ -171,7 +174,7 @@
                         jq("#blackcoat").html(0);
                     }
 
-                    this.service.evaluate(function (err, result) {
+                    self.service.evaluate(function (err, result) {
                         if (err) {
                             console.log("Cannot evaluate portfolio", err);
                         } else {
