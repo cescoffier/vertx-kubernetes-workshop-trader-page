@@ -46,7 +46,7 @@
                     </tr>
                     </thead>
                     <tbody id="operations">
-                        <tr v-for="action in recentActions">
+                        <tr v-for="action in recentActions" :key="action.id">
                             <td>{{ action.type }}</td>
                             <td>{{ action.amount }}</td>
                             <td>{{ action.company }}</td>
