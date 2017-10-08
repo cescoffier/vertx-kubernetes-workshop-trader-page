@@ -37,7 +37,7 @@
             <!-- operations -->
             <div class="col-md-6 block">
                 <h2>Last operations</h2>
-                <table class="table table-striped">
+                <table class="table table-striped" v-if="auditAvailable">
                     <thead>
                     <tr>
                         <th>Action</th>
@@ -46,9 +46,14 @@
                     </tr>
                     </thead>
                     <tbody id="operations">
-                    <!-- content added here -->
+                        <tr v-for="action in recentActions">
+                            <td>{{ action.type }}</td>
+                            <td>{{ action.amount }}</td>
+                            <td>{{ action.company }}</td>
+                        </tr>
                     </tbody>
                 </table>
+                <h3 v-else>No Audit Service Available</h3>
             </div>
         </div>
     </div>
@@ -57,6 +62,7 @@
 <script>
 import EventBus from 'vertx3-eventbus-client';
 import PortfolioService from "../libs/portfolio_service-proxy";
+import axios from 'axios';
 export default {
     name: 'TraderPage',
     data () {
@@ -69,15 +75,19 @@ export default {
                     'divinator': 0
                 }
             },
-            portfolioTask: 0,
-            service: {},
+            updateTaskId: 0,
+            service: null,
             cash: 0,
             value: 0,
             totalValue: 0,
-            eventbus: {}
+            eventbus: null,
+            recentActions: null
         }
     },
     computed: {
+        auditAvailable() {
+            return this.recentActions !== null;
+        },
         stockData() {
             let newVals = {};
             for (let [k ,v] of Object.entries(this.chartData.values)) {
@@ -113,24 +123,40 @@ export default {
         }
     },
     methods: {
-        updatePortfolio () {
-            this.service.getPortfolio((err, res) => {
-               if (err) {
-                   console.log('Error retrieving Portfolio data via ServiceProxy');
-               } else {
-                   this.chartData.values.macrohard = res.shares['MacroHard'];
-                   this.chartData.values.blackcoat = res.shares['Black Coat'];
-                   this.chartData.values.divinator = res.shares['Divinator'];
-                   this.cash = res.cash;
-                   this.service.evaluate((err, result) => {
-                       if (err) {
-                           console.log('Error calling `evaluate` on portfolio service proxy');
-                       } else {
-                           this.value = result;
-                           this.totalValue = this.cash + result;
-                       }
-                   });
-               }
+        updateTask () {
+            if (this.service) {
+                this.service.getPortfolio((err, res) => {
+                   if (err) {
+                       console.log('Error retrieving Portfolio data via ServiceProxy');
+                   } else {
+                       this.chartData.values.macrohard = res.shares['MacroHard'];
+                       this.chartData.values.blackcoat = res.shares['Black Coat'];
+                       this.chartData.values.divinator = res.shares['Divinator'];
+                       this.cash = res.cash;
+                       this.service.evaluate((err, result) => {
+                           if (err) {
+                               console.log('Error calling `evaluate` on portfolio service proxy');
+                           } else {
+                               this.value = result;
+                               this.totalValue = this.cash + result;
+                           }
+                       });
+                   }
+                });
+            }
+
+            console.log('Requesting audit log.');
+            // Request a list of audit events for display.
+            axios.get('/operations').then((res) => {
+                if (res.message) {
+                    console.log('Audit service is not returning results');
+                    this.recentActions.empty();
+                } else {
+                    this.recentActions = res;
+                }
+            }).catch((err) => {
+                console.log("Failed to retrieve recent actions from audit service.");
+                this.recentActions = null;
             });
         }
     },
@@ -154,10 +180,11 @@ export default {
             });
             this.service = new PortfolioService(this.eventbus, "service.portfolio");
             console.log("Service", this.service);
-            this.portfolioTask = setInterval(this.updatePortfolio, 10000);
         }).catch((err) => {
             console.log("Error opening eventbus: " + err.message);
         });
+        this.updateTask();
+        this.updateTaskId = setInterval(this.updateTask, 10000);
     },
     beforeDestroy () {
         clearInterval(this.portfolioTask);

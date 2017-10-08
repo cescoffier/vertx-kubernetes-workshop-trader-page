@@ -27,6 +27,7 @@
     "vue-template-compiler": "^2.3.4",
     "webpack": "^3.3.0",
     "webpack-dev-server": "^2.6.1",
-    "vertx3-eventbus-client": "^3.4.2"
+    "vertx3-eventbus-client": "^3.4.2",
+    "axios": "^0.16.2"
   }
 }
