@@ -25,6 +25,7 @@
       <groupId>com.github.yunyu.vertx-console</groupId>
       <artifactId>vertx-console-base</artifactId>
       <version>${vertx.console.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
