@@ -13,17 +13,17 @@
                     <h2>Portfolio</h2>
                     <dl class="dl-horizontal">
                         <dt>Cash</dt>
-                        <dd id="cash">{{ getCash }}</dd>
+                        <dd id="cash">{{ getCash | currency }}</dd>
                         <dt>Value</dt>
-                        <dd id="value">{{ getValue }}</dd>
+                        <dd id="value">{{ getValue | currency }}</dd>
                         <dt>Total Value</dt>
-                        <dd id="total">{{ getTotalValue }}</dd>
+                        <dd id="total">{{ getTotalValue | currency }}</dd>
                         <dt>Divinator Shares</dt>
-                        <dd>{{ getMacroHard }}</dd>
+                        <dd>{{ getMacroHard | currency }}</dd>
                         <dt>Black Coat Shares</dt>
-                        <dd>{{ getBlackCoat }}</dd>
+                        <dd>{{ getBlackCoat | currency }}</dd>
                         <dt>MacroHard Shares</dt>
-                        <dd>{{ getDivinator }}</dd>
+                        <dd>{{ getDivinator | currency }}</dd>
                     </dl>
                 </div>
 
@@ -105,6 +105,11 @@ export default {
         },
         getDivinator () {
             return parseFloat(this.chartData.values.divinator).toFixed(2);
+        }
+    },
+    filters: {
+        currency (input) {
+            return "$".concat(parseFloat(input).toFixed(2));
         }
     },
     methods: {
