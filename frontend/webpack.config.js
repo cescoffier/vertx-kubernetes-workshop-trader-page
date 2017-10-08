@@ -5,29 +5,23 @@ module.exports = {
   entry: './src/entry.js',
   output: {
     path: path.resolve(__dirname, './dist/consoleroot/js'),
-    publicPath: '/dist/consoleroot/js/',
-    filename: 'example.js'
+    publicPath: '/dist/consoleroot/js',
+    filename: 'trader.js'
   },
   module: {
     rules: [
       {
         test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
-          loaders: {
-            // Since sass-loader (weirdly) has SCSS as its default parse mode, we map
-            // the "scss" and "sass" values for the lang attribute to the right configs here.
-            // other preprocessors should work out of the box, no loader config like this necessary.
-            'scss': 'vue-style-loader!css-loader!sass-loader',
-            'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax'
-          }
-          // other vue-loader options go here
-        }
+        loader: 'vue-loader'
       },
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        exclude: /node_modules/
+        exclude: /node_modules/,
+        query: {
+          presets: ['react', 'es2015', 'react-hmre', 'stage-2'],
+          plugins: ['transform-class-properties']
+        }
       },
       {
         test: /\.(png|jpg|gif|svg)$/,
@@ -46,7 +40,7 @@ module.exports = {
     historyApiFallback: true,
     noInfo: true,
     proxy: {
-      '/admin/example': {
+      '/admin/trader': {
         target: 'http://localhost:5000',
         secure: false,
         ws: true
@@ -59,23 +53,23 @@ module.exports = {
   // devtool: '#eval-source-map'
 }
 
-if (process.env.NODE_ENV === 'production') {
-  // module.exports.devtool = '#source-map'
-  // http://vue-loader.vuejs.org/en/workflow/production.html
-  module.exports.plugins = (module.exports.plugins || []).concat([
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: '"production"'
-      }
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      // sourceMap: true,
-      compress: {
-        warnings: false
-      }
-    }),
-    new webpack.LoaderOptionsPlugin({
-      minimize: true
-    })
-  ])
-}
+// if (process.env.NODE_ENV === 'production') {
+//   // module.exports.devtool = '#source-map'
+//   // http://vue-loader.vuejs.org/en/workflow/production.html
+//   module.exports.plugins = (module.exports.plugins || []).concat([
+//     new webpack.DefinePlugin({
+//       'process.env': {
+//         NODE_ENV: '"production"'
+//       }
+//     }),
+//     new webpack.optimize.UglifyJsPlugin({
+//       // sourceMap: true,
+//       compress: {
+//         warnings: false
+//       }
+//     }),
+//     new webpack.LoaderOptionsPlugin({
+//       minimize: true
+//     })
+//   ])
+// }

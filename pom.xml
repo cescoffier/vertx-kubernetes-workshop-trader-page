@@ -10,7 +10,7 @@
 
   <properties>
     <vertx.console.version>c546f3d</vertx.console.version>
-    <frontend.directory>src/main/frontend</frontend.directory>
+    <frontend.directory>frontend</frontend.directory>
   </properties>
 
   <repositories>
@@ -46,6 +46,8 @@
         <version>1.5</version>
         <configuration>
           <workingDirectory>${frontend.directory}</workingDirectory>
+          <nodeVersion>v8.3.0</nodeVersion>
+          <yarnVersion>v0.27.5</yarnVersion>
         </configuration>
         <executions>
           <execution>
@@ -53,19 +55,17 @@
             <goals>
               <goal>install-node-and-yarn</goal>
             </goals>
-            <configuration>
-              <nodeVersion>v8.3.0</nodeVersion>
-              <yarnVersion>v0.27.5</yarnVersion>
-            </configuration>
           </execution>
           <execution>
             <id>yarn install</id>
+            <phase>generate-sources</phase>
             <goals>
               <goal>yarn</goal>
             </goals>
           </execution>
           <execution>
             <id>yarn run build</id>
+            <phase>generate-sources</phase>
             <goals>
               <goal>yarn</goal>
             </goals>
@@ -80,6 +80,7 @@
         <artifactId>vertx-maven-plugin</artifactId>
         <version>1.0.9</version>
         <configuration>
+          <verticle>io.vertx.workshop.dashboard.TestVerticle</verticle>
           <redeploy>true</redeploy>
           <jvmArgs>-Dvertx.metrics.options.enabled=true -Dvertx.metrics.options.registryName=vertx-dw</jvmArgs>
         </configuration>
@@ -93,6 +94,11 @@
         </configuration>
       </plugin>
     </plugins>
+    <resources>
+      <resource>
+        <directory>${frontend.directory}/dist</directory>
+      </resource>
+    </resources>
   </build>
 
 </project>
