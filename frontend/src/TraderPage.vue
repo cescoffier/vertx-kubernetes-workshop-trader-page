@@ -13,18 +13,17 @@
                     <h2>Portfolio</h2>
                     <dl class="dl-horizontal">
                         <dt>Cash</dt>
-                        <dd id="cash">{{ getCashValue() }}</dd>
+                        <dd id="cash">{{ getCash }}</dd>
                         <dt>Value</dt>
-                        <dd id="value">{{ getValue() }}</dd>
+                        <dd id="value">{{ getValue }}</dd>
                         <dt>Total Value</dt>
-                        <dd id="total">{{ getTotalValue() }}</dd>
-                        <dt v-for=""
+                        <dd id="total">{{ getTotalValue }}</dd>
                         <dt>Divinator Shares</dt>
-                        <dd id="divinator">{{ getMacroHard() }}</dd>
+                        <dd>{{ getMacroHard }}</dd>
                         <dt>Black Coat Shares</dt>
-                        <dd id="blackcoat">{{ getBlackCoat() }}</dd>
+                        <dd>{{ getBlackCoat }}</dd>
                         <dt>MacroHard Shares</dt>
-                        <dd id="macrohard">{{ getDivinator() }}</dd>
+                        <dd>{{ getDivinator }}</dd>
                     </dl>
                 </div>
 
