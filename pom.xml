@@ -47,15 +47,17 @@
         <version>1.5</version>
         <configuration>
           <workingDirectory>${frontend.directory}</workingDirectory>
+          <installDirectory>${project.basedir}</installDirectory>
           <nodeVersion>v8.3.0</nodeVersion>
           <yarnVersion>v0.27.5</yarnVersion>
         </configuration>
         <executions>
           <execution>
-            <id>install node and yarn</id>
+            <id>install_node_and_yarn</id>
             <goals>
               <goal>install-node-and-yarn</goal>
             </goals>
+            <phase>generate-sources</phase>
           </execution>
           <execution>
             <id>yarn install</id>
