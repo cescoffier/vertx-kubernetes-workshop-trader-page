@@ -29,7 +29,10 @@
 
   /**
  A service managing a portfolio.
-
+ <p>
+ This service is an event bus service (a.k.a service proxies, or async RPC). The client and server are generated at
+ compile time.
+ <p>
  @class
   */
   var PortfolioService = function(eb, address) {
@@ -47,9 +50,10 @@
     };
 
     /**
+     Gets the portfolio.
 
      @public
-     @param resultHandler {function} 
+     @param resultHandler {function} the result handler called when the portfolio has been retrieved. The async result indicates whether the call was successful or not. 
      */
     this.getPortfolio = function(resultHandler) {
       var __args = arguments;
@@ -63,11 +67,12 @@
     };
 
     /**
+     Buy `amount` shares of the given shares (quote).
 
      @public
-     @param amount {number} 
-     @param quote {Object} 
-     @param resultHandler {function} 
+     @param amount {number} the amount 
+     @param quote {Object} the last quote 
+     @param resultHandler {function} the result handler with the updated portfolio. If the action cannot be executed, the async result is market as a failure (not enough money, not enough shares available...) 
      */
     this.buy = function(amount, quote, resultHandler) {
       var __args = arguments;
@@ -81,11 +86,12 @@
     };
 
     /**
+     Sell `amount` shares of the given shares (quote).
 
      @public
-     @param amount {number} 
-     @param quote {Object} 
-     @param resultHandler {function} 
+     @param amount {number} the amount 
+     @param quote {Object} the last quote 
+     @param resultHandler {function} the result handler with the updated portfolio. If the action cannot be executed, the async result is market as a failure (not enough share...) 
      */
     this.sell = function(amount, quote, resultHandler) {
       var __args = arguments;
@@ -99,9 +105,10 @@
     };
 
     /**
+     Evaluates the current value of the portfolio.
 
      @public
-     @param resultHandler {function} 
+     @param resultHandler {function} the result handler with the valuation 
      */
     this.evaluate = function(resultHandler) {
       var __args = arguments;
@@ -114,23 +121,6 @@
       } else throw new TypeError('function invoked with invalid arguments');
     };
 
-  };
-
-  /**
-
-   @memberof module:vertx-workshop-portfolio-js/portfolio_service
-   @param vertx {Vertx} 
-   @return {PortfolioService}
-   */
-  PortfolioService.getProxy = function(vertx) {
-    var __args = arguments;
-    if (__args.length === 1 && typeof __args[0] === 'object' && __args[0]._jdel) {
-      if (closed) {
-        throw new Error('Proxy is closed');
-      }
-      j_eb.send(j_address, {"vertx":__args[0]}, {"action":"getProxy"});
-      return;
-    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   if (typeof exports !== 'undefined') {
