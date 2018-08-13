@@ -9,7 +9,7 @@
   <version>0.0.1-SNAPSHOT</version>
 
   <properties>
-    <vertx.console.version>c546f3d</vertx.console.version>
+    <vertx.console.version>1558a31</vertx.console.version>
     <frontend.directory>frontend</frontend.directory>
   </properties>
 
@@ -30,12 +30,12 @@
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
-      <version>3.5.0.Beta1</version>
+      <version>3.5.3</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-web</artifactId>
-      <version>3.5.0.Beta1</version>
+      <version>3.5.3</version>
     </dependency>
   </dependencies>
 
@@ -79,9 +79,9 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>io.fabric8</groupId>
+        <groupId>io.reactiverse</groupId>
         <artifactId>vertx-maven-plugin</artifactId>
-        <version>1.0.9</version>
+        <version>1.0.15</version>
         <configuration>
           <verticle>io.vertx.workshop.dashboard.TestVerticle</verticle>
           <redeploy>true</redeploy>
